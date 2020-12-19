@@ -1,0 +1,157 @@
+#include <iostream>
+using namespace std;
+
+template <class ElemType>
+class SqList
+{
+protected:
+	int count;			// 元素个数
+	int maxSize;		// 顺序表最大元素个数
+	ElemType *elems;
+	public:
+	SqList(int size = 10);	// 构造函数模板
+	virtual ~SqList();				// 析构函数模板
+	int Length() const;			// 求线性表长度
+	bool Empty() const;			// 判断线性表是否为空
+	void Clear();				// 将线性表清空
+    void Traverse(void(* visit)(const ElemType &))const;
+ 	bool GetElem(int position, ElemType &e) const;       // 求指定位置的元素
+	bool SetElem(int position, const ElemType &e);       // 设置指定位置的元素值
+	bool Insert(int position, const ElemType &e); // 插入元素
+	bool Delete(int position, ElemType &e);
+
+};
+
+template <class ElemType>
+SqList<ElemType>::SqList(int  size)
+{
+       maxSize=size;
+       elems = new ElemType[maxSize];
+       count=0;
+}
+
+template <class ElemType>
+SqList<ElemType>::~SqList()
+{
+	delete []elems;		// 释放存储空间
+}
+
+template <class ElemType>
+int SqList<ElemType>::Length()const
+{
+	return count;
+}
+
+template <class ElemType>
+bool SqList<ElemType>::Empty()const
+{
+	return count==0;
+}
+
+template <class ElemType>
+void SqList<ElemType>::Clear()
+{
+	count=0;
+}
+
+template <class ElemType>
+void SqList<ElemType>::Traverse(void(* visit)(const ElemType &))const
+{
+    for(int pos=1;pos<=Length();pos++)
+    {
+        (*visit)(elems[pos-1]);
+    }
+}
+
+template <class ElemType>
+bool SqList<ElemType>::GetElem(int position, ElemType &e)const
+{
+	if(position<1||position>Length())
+		return false;
+	else
+	{
+		e=elems[position-1];
+		return true;
+	}
+}
+
+template <class ElemType>
+bool SqList<ElemType>::SetElem(int position, const ElemType &e)
+{
+	if(position<1||position>Length())
+		return false;
+	else
+	{
+		elems[position-1]=e;
+		return true;
+	}
+}
+
+template <class ElemType>
+bool SqList<ElemType>::Insert(int position, const ElemType &e)
+{	ElemType tmp;
+    if (count == maxSize)
+    {  return false;   }
+	else if (position<1 || position>Length()+1)
+	{  return false;  }
+	else
+	{
+		count++;
+		for (int pos = Length(); pos>=position;pos--)
+		{
+			GetElem(pos,tmp);SetElem(pos+1,tmp);
+        }
+		SetElem(position,e);
+		return true;
+    }
+}
+
+template <class ElemType>
+bool SqList<ElemType>::Delete(int position, ElemType &e)
+{
+    ElemType tmp;
+    if(position<1||position>Length())
+    {
+        return false;
+    }
+    else
+    {
+        GetElem(position,e);
+        for(int pos=position+1;pos<=Length();pos++)
+        {
+            GetElem(pos,tmp);SetElem(pos-1,tmp);
+        }
+        count--;
+        cout<<"删除成功"<<endl;
+        return true;
+    }
+}
+
+void print(const int &i)
+{
+    cout<<"my name is "<<i<<endl;
+}
+
+int main()
+{
+    int aElem,bElem;
+    SqList<int> l1;
+    l1.Insert(1,11);
+    l1.Insert(2,12);
+    l1.Insert(3,13);
+    l1.Insert(4,14);
+    l1.Insert(5,15);
+
+    l1.Traverse(print);
+    cout<<"----------------"<<endl;
+    for(int i=0;i<l1.Length()/2;i++)
+    {
+        l1.GetElem(i,aElem);
+        l1.GetElem(l1.Length()-i+1,bElem);
+
+        l1.SetElem(i,bElem);
+        l1.SetElem(l1.Length()-i+1,aElem);
+    }
+    l1.Traverse(print);
+    return 0;
+}
